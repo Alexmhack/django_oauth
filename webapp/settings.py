@@ -117,6 +117,13 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
+# AUTHENTICATION URLS
+
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+LOGIN_REDIRECT_URL = 'home'
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
