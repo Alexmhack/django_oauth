@@ -124,6 +124,12 @@ LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = 'dashboard'
 
 
+# Social Auth Keys
+
+SOCIAL_AUTH_GITHUB_KEY = config("SOCIAL_AUTH_GITHUB_KEY")
+SOCIAL_AUTH_GITHUB_SECRET = config("SOCIAL_AUTH_GITHUB_SECRET")
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
