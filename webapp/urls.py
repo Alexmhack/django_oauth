@@ -17,7 +17,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
 
-from display.views import home_view, dashboard_view
+from display.views import (
+    home_view,
+    dashboard_view,
+    settings_view,
+    password_view
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,4 +37,9 @@ urlpatterns += [
 
 urlpatterns += [
     path('oauth/', include('social_django.urls', namespace='social')),
+]
+
+urlpatterns += [
+    path('settings/', settings_view, name='settings'),
+    path('password/', password_view, name='password'),
 ]
