@@ -396,3 +396,100 @@ SOCIAL_AUTH_FACEBOOK_SECRET = config("SOCIAL_AUTH_FACEBOOK_SECRET")
 
 Add facebook login url in login template 
 ```{% url 'social:begin' 'facebook' %}```
+
+There were some errors when I was handling facebook auth so we will cover this 
+part later.
+
+# Google Authentication
+Add google backends in **settings.py**
+
+```
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.twitter.TwitterOAuth',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.open_id.OpenIdAuth',  # for Google authentication
+    'social_core.backends.google.GoogleOpenId',  # for Google authentication
+    'social_core.backends.google.GoogleOAuth2',  # for Google authentication
+    'django.contrib.auth.backends.ModelBackend',
+)
+```
+
+Go to the Google Google Developers Console and then click on create button.
+
+Enter project name e.g **Django App**. Wait for a few seconds your project 
+should be created.
+
+On the right side there is credentials tab, select it. You will be shown many 
+services available from Google. Click on **Google+ API** then enable it. Click on
+**create credentials** and **Authorized redirect URIs** similar to what we have done before
+
+```
+http://djapp.com:8000/oauth/complete/google-oauth2/
+```
+
+Then in **Authorized JavaScript origins** add the home url for our app 
+
+```
+http://djapp.com:8000/
+```
+
+Hit save and again in the **Credentials** section click on your app. From the 
+next page copy paste the key and secret in ```.env``` file.
+
+```
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=<your_key>
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=<your secret>
+```
+
+In **settings.py** file add your env variables for google.
+
+```
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
+```
+
+Update ```login.html``` file by adding **google** login url.
+
+```
+<a href="{% url 'social:begin' 'google-oauth2' %}">Login with Google</a>
+```
+
+Login using this link and you will be asked to sign in using google account. Then
+redirected to the dashboard where your google username will be shown.
+
+# Social Auth Management Page
+We can now add a Settings page in our application, where the user can manage the 
+social auth logins. It’s a good way for the user authorize new services or 
+revoke the access.
+
+Basically this page will be responsible for:
+
+1. Disconnecting the user from the social networks
+2. Control if the user can disconnect (that is, the user have defined a password, so he/she won’t be locked out of the system)
+3. Provide means to connect to other social networks
+
+Add **settings** and **password** urls in ```urls.py``` file.
+
+```
+from display.views import (
+    home_view,
+    dashboard_view,
+    settings_view,
+    password_view
+)
+
+...
+urlpatterns += [
+    path('settings/', settings_view, name='settings'),
+    path('password/', password_view, name='password'),
+]
+```
+
+Now update the project ```settings.py``` file with the following configurations:
+
+```
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/settings/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/settings/'
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+```
