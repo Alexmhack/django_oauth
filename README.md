@@ -167,7 +167,7 @@ def home_view(request):
 ```
 from django.contrib import admin
 from django.urls import path, include
-from django.contrib.auth.views import login, logout
+from django.contrib.auth.views import LoginView, LogoutView
 
 # use either one as per your project
 from display.views import home_view 	# for separate app
@@ -179,8 +179,8 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path('login/', login, name='login'),
-    path('logout/', logout, name='logout'),
+    path('login/', LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
 ]
 
 urlpatterns += [
@@ -212,6 +212,9 @@ logged in to our app. That is where ```'dashboard'``` comes in
 
 **views.py**
 ```
+from django.contrib.auth.decorators import login_required
+
+@login_required
 def dashboard_view(request):
 	return render(request, 'dashboard.html')
 ```
@@ -234,3 +237,162 @@ Now create the templates ```home.html``` and ```dashboard.html``` and
 ```base.html``` in templates folder, I will use bootstrap in my templates, so I 
 have **static** folder also that contains all the files. You can refer my 
 templates and static folder and copy paste the code from there.
+
+If you now go to [127.0.0.1:8000/login](http://127.0.0.1:8000/login) you would get error saying template does not exist at ```registration/login.html```
+
+This comes of from the ```LoginView.as_view()``` and the same would happen with
+logout url so let's create a folder **registration** in templates folder.
+
+Inside registration folder create ```login.html``` and ```logout.html``` files.
+
+We will add html code in them. But now we will handle the social authentications.
+
+# Github Authentication
+Go to your github account and go to **settings** page. On the left side menu in 
+the bottom click on **Developer settings**. In there click on **OAuth 
+Applications**.
+
+In there **Register a new application** and fill in the details. You can enter 
+any details in the other fields but the most important field is the 
+**Authorization callback URL**.
+
+Since we are working on localhost we will enter 
+```http://localhost:8000/oauth/complete/github/```
+
+Hit Create and you will get the ```Client ID``` and ```Client Secret```
+
+```
+Client ID
+------------
+
+Client Secret
+------------
+```
+
+This information has to be kept secret so, we will use ```.env``` file
+
+```
+SOCIAL_AUTH_GITHUB_KEY=<your id>
+SOCIAL_AUTH_GITHUB_SECRET=<your secret>
+```
+
+We have our settings ready, now we will add a github login button in login template
+
+```
+<a type="button" href="{% url 'social:begin' 'github' %}" class="light-blue-text mx-2">
+<i class="fa fa-github"></i>
+</a>
+```
+
+Important part is ```{% url 'social:begin' 'github' %}```
+
+Go to [127.0.0.1:8000/login](http://127.0.0.1:8000/login) url again and click on
+github login url. It should give you errors mentioning ```redirect_uri```
+
+That errors are due to ```localhost``` set at the **Authorization callback URL**
+of github account. Okay the first way to solve that problem is to use **hosts**
+in **windows**
+
+Go to ```C:\Windows\System32\drivers\etc``` and open ```hosts``` file with 
+notepad...
+
+At last you should see...
+
+```
+#	127.0.0.1       localhost
+#	::1             localhost
+```
+
+After this add 
+
+```
+127.0.0.1		djapp.com
+127.0.0.1		www.djapp.com
+```
+
+You can change ```djapp.com``` to any other url but I am using this one.
+
+Now we need to configure our github app and add 
+```http://djapp.com:8000/oauth/complete/github/``` to **Authorization callback URL** and then **Update Seetings**
+
+Now if you run server and  head to [http://djapp.com:8000/](http://djapp.com:8000/) you should see your homepage on the browser. So what we 
+have done is redirect our localhost to ```http://djapp.com:8000/``` url on the 
+local computer.
+
+Now go to login url again and then click github login button and everything 
+works fine. You can authenticate github app and after process is complete you 
+should be redirected to ```dashboard``` url because we have set that in 
+```settings.py``` file under ```LOGIN_REDIRECT_URL = 'dashboard'```
+
+One more thing you can do is to display the username on the dashboard template
+
+**templates/dashboard.html**
+```
+{% extends "base.html" %}
+
+{% block title %}
+	{{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+	<h1 class="mt-5 text-center">Welcome {{ request.user }}</h1>
+
+{% endblock content %}
+```
+
+## Django [Admin](http://127.0.0.1:8000/admin/)
+If you head onto admin site. You should see ```Python Social Auth``` section.
+Click on it and you find the users that have logged in using github. Try 
+creating more users by logging out and then again logging in with another github 
+account. You should see all users onto admin site.
+
+**The next time you logout and then again login using the github link it should 
+automatically authenticate and redirect to dashboard**
+
+# Twitter Authentication
+Go to [apps.twitter.com](http://apps.twitter.com) and it should prompt you to 
+setup developer account. Fill in all the details and after process is complete 
+and on apps page of developer account click on **Create new App**. When asked to 
+enter **callback url** enter ```http://djapp.com:8000/oauth/complete/twitter/```
+or whatever you saved in ```hosts``` file.
+
+Go to **Permissions** section and edit it and set to **Read only**. The less 
+permissions we have better. This way we make our users more comfortable.
+
+Now go to Keys and Access Tokens tab and grab the Consumer Key (API Key) and 
+Consumer Secret (API Secret) and update the settings.py:
+
+```
+SOCIAL_AUTH_TWITTER_KEY = config("SOCIAL_AUTH_TWITTER_KEY")
+SOCIAL_AUTH_TWITTER_SECRET = config("SOCIAL_AUTH_TWITTER_SECRET")
+```
+
+And yes don't forget to add those variables with your values in ```.env``` file.
+
+Again add the twitter url onto login page
+
+```
+<a href="{% url 'social:begin' 'twitter' %}">Login with twitter</a>
+```
+
+On clicking this link you should get prompt to authorize application. This 
+should redirect you to the dashboard and display your username on twitter.
+
+If you visit the admin site and look at the **User social auths** and you should
+see the provider and twitter username.
+
+# Facebook Authenticaion
+Go to [developers.facebook.com/](http://developers.facebook.com/) click on My 
+Apps and then Add a New App. On the app page on the left menu bar click on 
+**settings > basic** and copy the **App ID** and **App Secret** and add it to
+```.env``` file then set them in **settings.py**
+
+```
+SOCIAL_AUTH_FACEBOOK_KEY = config("SOCIAL_AUTH_FACEBOOK_KEY")
+SOCIAL_AUTH_FACEBOOK_SECRET = config("SOCIAL_AUTH_FACEBOOK_SECRET")
+...
+```
+
+Add facebook login url in login template 
+```{% url 'social:begin' 'facebook' %}```
