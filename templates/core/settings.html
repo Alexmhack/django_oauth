@@ -32,6 +32,8 @@
 
 		<a class="btn btn-default" href="{% url 'social:begin' 'github' %}">Connect to Github</a>
 
+	{% endif %}
+	
 	<h3>Twitter Settings</h3>
 
 	{% if twitter_login %}
@@ -56,6 +58,8 @@
 
 		<a class="btn btn-default" href="{% url 'social:begin' 'twitter' %}">Connect to twitter</a>
 
+	{% endif %}
+
 	<h3>Facebook Settings</h3>
 
 	{% if facebook_login %}
@@ -78,7 +82,9 @@
 
 	{% else %}
 
-		<a class="btn btn-default" href="{% url 'social:begin' 'facebook' %}">Connect to Facebook</a>	
+		<a class="btn btn-default" href="{% url 'social:begin' 'facebook' %}">Connect to Facebook</a>
+
+	{% endif %}
 
 
 {% endblock %}
