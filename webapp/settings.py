@@ -27,7 +27,7 @@ SECRET_KEY = config("PROJECT_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['djapp.com', '64dc637c.ngrok.io']  # config("ALLOWED_HOSTS")
+ALLOWED_HOSTS = ['djapp.com', '64dc637c.ngrok.io', '127.0.0.1']  # config("ALLOWED_HOSTS")
 
 
 # Application definition
