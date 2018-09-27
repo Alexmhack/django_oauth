@@ -41,7 +41,7 @@
                 <!-- user icon -->
                 <div class="white-text">
             	   <i class="fa fa-user" aria-hidden="true"></i>
-                   {{ request.user }}
+                   {{ request.user.first_name }}
                 </div>
             {% else %}
                 <a class="btn btn-outline-white btn-md my-2 my-sm-0 ml-3" href="{% url 'login' %}">Login</a>
