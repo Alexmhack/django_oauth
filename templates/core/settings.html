@@ -49,7 +49,7 @@
 
 		{% else %}
 
-		<button type="submit" disabled>Disconnect from twitter</button>
+		<button type="submit" class="btn btn-outline-danger waves-effect" disabled>Disconnect from twitter</button>
 		<p>You must define a <a href="{% url 'password' %}">password</a> before disconnecting from Twitter</p>
 
 		{% endif %}
@@ -75,7 +75,7 @@
 
 		{% else %}
 
-		<button type="submit" disabled>Disconnect from facebook</button>
+		<button type="submit" class="btn btn-outline-danger waves-effect" disabled>Disconnect from facebook</button>
 		<p>You must define a <a href="{% url 'password' %}">password</a> before disconnecting from Facebook</p>
 
 		{% endif %}
