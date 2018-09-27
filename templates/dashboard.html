@@ -6,6 +6,6 @@
 
 {% block content %}
 
-	<h1 class="mt-5 text-center">Welcome {{ request.user }}</h1>
+	<h1 class="mt-5 text-center">Welcome {{ request.user.first_name }}</h1>
 
 {% endblock content %}
