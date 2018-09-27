@@ -498,5 +498,42 @@ Next we will create a view for **settings** page...
 
 **display/views.py**
 ```
+@login_required
+def settings_view(request):
+	user = request.user
 
+	try:
+		github_login = user.social_auth.get(provider='github')
+	except UserSocialAuth.DoesNotExist:
+		github_login = None
+
+	try:
+		twitter_login = user.social_auth.get(provider='twitter')
+	except UserSocialAuth.DoesNotExist:
+		twitter_login = None
+
+	try:
+		facebook_login = user.social_auth.get(provider='facebook')
+	except UserSocialAuth.DoesNotExist:
+		facebook_login = None
+
+	can_disconnect = (user.social_auth.count() > 1 or user.has_usable_password())
+
+	return render(request, 'core/settings.html', {
+		'github_login': github_login,
+		'twitter_login': twitter_login,
+		'facebook_login': facebook_login,
+		'can_disconnect': can_disconnect
+	})
 ```
+
+We add ```@login_required``` decorator and store the user first. We try to get 
+the provider details if it exists else we store ```None``` and also we count the 
+social auths linked with the current user and if the number is greater than 1 
+or the user has **usable password** which means user can log in using his 
+password then ```can_disconnect``` is ```True``` else ```False```. Finally we 
+pass in all the values in context.
+
+Checkout the **templates/core/settings.html** and **templates/core/password.html** files for implentation of the forms and buttons.
+
+We user ```request.user``` to display the user, we can also use ```request.user.first_name``` for displaying the first name of the user.
