@@ -18,7 +18,7 @@
 
 		<form method="post" action="{% url 'social:disconnect' 'github' %}">
 			{% csrf_token %}
-			<button class="btn btn-outline-secondary waves-effect" type="submit">Disconnect from Github</button>
+			<button class="btn btn-outline-danger waves-effect" type="submit">Disconnect from Github</button>
 		</form>
 
 		{% else %}
